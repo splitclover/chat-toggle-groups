@@ -1,0 +1,79 @@
+.linked-toggle-group-edit,
+.linked-toggle-group-action,
+.group-move-up,
+.group-move-down {
+    font-size: 1.2em;
+    margin-right: 10px;
+    cursor: pointer;
+    color: var(--SmartThemeBodyColor);
+    transition: color 0.3s ease;
+}
+
+.linked-toggle-group-edit {
+    margin-left: 10px;
+}
+
+.drawer-header-right {
+    display: flex;
+    align-items: center;
+}
+
+.linked-toggle-group-edit:hover,
+.group-move-up:hover,
+.group-move-down:hover {
+    color: var(--SmartThemeQuoteColor);
+}
+
+.linked-toggle-group-action.fa-toggle-on {
+    color: var(--SmartThemeQuoteColor);
+}
+
+.group-move-up,
+.group-move-down {
+    margin-right: 5px;
+}
+
+.group-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.delete-group {
+    color: var(--SmartThemeBodyColor);
+}
+
+.linked-toggle-group-action {
+    padding: 5px 5px;
+}
+
+.toggle-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.toggle-item .toggle-target {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.toggle-item .toggle-behavior {
+    width: 60px; /* Adjust this value as needed */
+    margin-right: 10px;
+}
+
+.toggle-actions {
+    display: flex;
+    align-items: center;
+}
+
+.toggle-actions i {
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+/* Increase the font size for emoji */
+.toggle-behavior {
+    font-size: 18px;
+}
