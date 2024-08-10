@@ -15,11 +15,9 @@ const defaultSettings = {
     presets: {}
 };
 
-function escapeString(s) {
-    const el = document.createElement("p");
-    el.textContent = s;
-    return el.innerHTML;
-}
+const escapeString = (str) => str.replace(/[&<>"']/g, match => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;',
+})[match]);
 
 jQuery(async () => {
     await loadSettings();
