@@ -71,11 +71,21 @@ function loadGroupsForCurrentPreset() {
 }
 
 async function loadSettings() {
-    //Create the settings if they don't exist
-    extension_settings[extensionName] = extension_settings[extensionName] || {};
-    if (Object.keys(extension_settings[extensionName]).length === 0) {
-        Object.assign(extension_settings[extensionName], defaultSettings);
+    // Initialize extensionSettings with default settings if it doesn't exist
+    if (!extension_settings[extensionName]) {
+        extension_settings[extensionName] = Object.assign({}, defaultSettings);
     }
+
+    // Assign extensionSettings for easier access
+    extensionSettings = extension_settings[extensionName];
+
+    // Ensure all default settings are present
+    for (const [key, value] of Object.entries(defaultSettings)) {
+        if (!extensionSettings.hasOwnProperty(key)) {
+            extensionSettings[key] = value;
+        }
+    }
+
     // Load the drawer template
     const drawerTemplate = await $.get(`${extensionFolderPath}/drawer-template.html`);
     // Store the template in the extension settings for later use
