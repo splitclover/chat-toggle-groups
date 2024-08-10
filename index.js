@@ -15,6 +15,12 @@ const defaultSettings = {
     presets: {}
 };
 
+function escapeString(s) {
+    const el = document.createElement("p");
+    el.textContent = s;
+    return el.innerHTML;
+}
+
 jQuery(async () => {
     await loadSettings();
     const toggleMenu = await $.get(`${extensionFolderPath}/toggle-menu.html`);
@@ -102,7 +108,7 @@ function loadGroups(groups) {
     $toggleGroups.empty(); // Clear existing groups
 
     groups.forEach(group => {
-        const $groupElement = $(extensionSettings.drawerTemplate.replace('{{GROUP_NAME}}', group.name));
+        const $groupElement = $(extensionSettings.drawerTemplate.replace('{{GROUP_NAME}}', escapeString(group.name)));
         const $toggleList = $groupElement.find('.toggle-list');
         const $toggleAction = $groupElement.find('.linked-toggle-group-action');
 
