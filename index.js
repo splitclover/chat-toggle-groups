@@ -9,7 +9,7 @@ import {
 
 const extensionName = "chat-toggle-groups";
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
-const extensionSettings = extension_settings[extensionName];
+let extensionSettings = extension_settings[extensionName];
 const defaultSettings = {
     version: "1.0.0",
     presets: {}
@@ -71,7 +71,7 @@ function loadGroupsForCurrentPreset() {
 }
 
 async function loadSettings() {
-    // Initialize extensionSettings with default settings if it doesn't exist
+    // Initialize extension_settings[extensionName] with default settings if it doesn't exist
     if (!extension_settings[extensionName]) {
         extension_settings[extensionName] = Object.assign({}, defaultSettings);
     }
