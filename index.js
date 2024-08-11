@@ -1,6 +1,9 @@
 import { extension_settings, getContext } from "../../../extensions.js";
 import { oai_settings, setupChatCompletionPromptManager } from "../../../openai.js";
 import { POPUP_TYPE, callGenericPopup } from "../../../popup.js";
+import { SlashCommandParser } from '../../../slash-commands/SlashCommandParser.js';
+import { SlashCommand } from '../../../slash-commands/SlashCommand.js';
+import { ARGUMENT_TYPE, SlashCommandArgument, SlashCommandNamedArgument } from '../../../slash-commands/SlashCommandArgument.js';
 import {
     eventSource,
     event_types,
@@ -358,6 +361,10 @@ function applyToggleBehavior(promptManager, toggle, isGroupOn) {
 async function editGroupName($group, currentName) {
     const newName = await callGenericPopup("Enter a name for the new group:", POPUP_TYPE.INPUT, currentName);
     if (newName && newName !== currentName) {
+        if (groupNameExists(newName)) {
+            toastr.warning(`Group "${newName}" already exists!"`);
+            return;
+        }
         const $groupName = $group.find('.group-name');
         $groupName.text(newName);
 
@@ -384,6 +391,10 @@ function deleteGroup($group, groupName) {
 async function onAddGroupClick() {
     const groupName = await callGenericPopup("Enter a name for the new group:", POPUP_TYPE.INPUT, '');
     if (groupName) {
+        if (groupNameExists(groupName)) {
+            toastr.warning(`Group "${groupName}" already exists!"`);
+            return;
+        }
         const newGroup = {
             name: groupName,
             toggles: [],
@@ -406,4 +417,92 @@ function saveSettings() {
     // Save the extension settings
     extension_settings[extensionName] = extensionSettings;
     saveSettingsDebounced();
+}
+
+function groupNameExists(groupName) {
+    const currentPreset = oai_settings.preset_settings_openai;
+    const groups = extensionSettings.presets[currentPreset] || [];
+    const groupNameLower = groupName.toLowerCase();
+
+    return groups.some(group => group.name.toLowerCase() === groupNameLower);
+}
+
+SlashCommandParser.addCommandObject(SlashCommand.fromProps({
+    name: 'toggle-group',
+    callback: (namedArgs, unnamedArgs) => {
+        const searchString = unnamedArgs.toString();
+        const targetState = namedArgs.state ?? 'toggle';
+        toggleGroupsByString(searchString, targetState);
+    },
+    aliases: ['tg'],
+    // returns: 'void',
+    namedArgumentList: [
+        SlashCommandNamedArgument.fromProps({
+            name: 'state',
+            description: 'the target state for the group',
+            typeList: ARGUMENT_TYPE.STRING,
+            defaultValue: 'toggle',
+            enumList: ['on', 'off', 'toggle'],
+        }),
+    ],
+    unnamedArgumentList: [
+        SlashCommandArgument.fromProps({
+            description: 'the string of the group name',
+            typeList: ARGUMENT_TYPE.STRING,
+            isRequired: true,
+        }),
+    ],
+    helpString: `
+        <div>
+            Toggles the state of a group named with the provided string.
+        </div>
+        <div>
+            <strong>Example:</strong>
+            <ul>
+                <li>
+                    <pre><code class="language-stscript">/toggle-groups example</code></pre>
+                    toggles the state of group named "example"
+                </li>
+                <li>
+                    <pre><code class="language-stscript">/tg state=on test</code></pre>
+                    turns on group named "test"
+                </li>
+                <li>
+                    <pre><code class="language-stscript">/tg state=off foo</code></pre>
+                    turns off group named "foo"
+                </li>
+            </ul>
+        </div>
+    `,
+}));
+
+function toggleGroupsByString(searchString, targetState) {
+    const currentPreset = oai_settings.preset_settings_openai;
+    const groups = extensionSettings.presets[currentPreset] || [];
+    const searchStringLower = searchString.toLowerCase();
+    let foundGroups = false;
+
+    const $toggleGroups = $('.toggle-groups');
+
+    for (const group of groups) {
+        if (group.name.toLowerCase() === searchStringLower) {
+            foundGroups = true;
+            const isOn = targetState === 'toggle' ? !group.isOn : targetState === 'on';
+            updateGroupState(group.name, isOn);
+
+            const $group = $toggleGroups.find(`.toggle-group .group-name:contains(${escapeString(group.name)})`).closest('.toggle-group');
+            const $toggleAction = $group.find('.linked-toggle-group-action');
+
+            if (isOn) {
+                $toggleAction.removeClass('fa-toggle-off').addClass('fa-toggle-on');
+            } else {
+                $toggleAction.removeClass('fa-toggle-on').addClass('fa-toggle-off');
+            }
+            break; // Exit the loop early since a match was found
+        }
+    }
+
+    if (!foundGroups) {
+        toastr.warning(`No groups found containing "${searchString}".`);
+    }
 }
