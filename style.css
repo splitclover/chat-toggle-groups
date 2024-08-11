@@ -51,21 +51,29 @@
     display: flex;
     align-items: center;
     margin-bottom: 10px;
+    border-radius: 5px;
+    transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+    line-height: 2; /* Added line-height property */
 }
 
 .toggle-item .toggle-target {
     flex-grow: 1;
     margin-right: 10px;
+    margin-top: 5px;
+    margin-left: 10px;
+    padding-left: 5px;
 }
 
 .toggle-item .toggle-behavior {
     width: 60px; /* Adjust this value as needed */
     margin-right: 10px;
+    margin-top: 5px;
 }
 
 .toggle-actions {
     display: flex;
     align-items: center;
+    margin-right: 10px;
 }
 
 .toggle-actions i {
@@ -76,4 +84,43 @@
 /* Increase the font size for emoji */
 .toggle-behavior {
     font-size: 18px;
+}
+
+.toggle-item.enabled {
+    background-color: #5ee97e;
+    color: #155724;
+}
+
+.toggle-item.disabled {
+    background-color: #f36767;
+    color: #6c757d;
+    opacity: 0.5;
+}
+
+.linked-toggle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle-group-header-row {
+    display: flex;
+    align-items: center;
+}
+
+.disable-animation-container {
+    display: flex;
+    align-items: center;
+}
+
+.disable-animation-label {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.toggle-actions {
+    display: flex;
+    align-items: center;
+    vertical-align: middle; /* Align buttons vertically with the select elements */
 }

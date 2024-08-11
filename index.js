@@ -15,7 +15,8 @@ const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 let extensionSettings = extension_settings[extensionName];
 const defaultSettings = {
     version: "1.0.0",
-    presets: {}
+    presets: {},
+    disableAnimation: true, // Add this new setting
 };
 
 const escapeString = (str) => str.replace(/[&<>"']/g, match => ({
@@ -62,6 +63,15 @@ jQuery(async () => {
             // Reload the groups for the current preset
             loadGroupsForCurrentPreset();
         }
+    });
+
+    const $disableAnimationCheckbox = $('#disable-animation-checkbox');
+    $disableAnimationCheckbox.prop('checked', extensionSettings.disableAnimation);
+
+    // Add event listener for the "Disable Animation" checkbox
+    $('#disable-animation-checkbox').on('change', () => {
+        extensionSettings.disableAnimation = $('#disable-animation-checkbox').is(':checked');
+        saveSettings();
     });
 
     // Add event listener for preset changes
@@ -125,6 +135,7 @@ function loadGroups(groups) {
             populateTargetSelect($toggleItem.find('.toggle-target')); // Populate target options first
             $toggleItem.find('.toggle-target').val(toggle.target); // Then set the saved target
             $toggleItem.find('.toggle-behavior').val(toggle.behavior);
+            $toggleItem.attr('data-target', toggle.target); // Add data-target attribute
             $toggleList.append($toggleItem);
         });
 
@@ -262,6 +273,12 @@ function attachGroupEventListeners() {
         const $group = $(this).closest('.toggle-group');
         updateToggleSettings($group);
     });
+
+    $toggleGroups.on("change", ".toggle-target", function() {
+        const $toggleItem = $(this).closest('.toggle-item');
+        const newTarget = $(this).val();
+        $toggleItem.attr('data-target', newTarget);
+    });
 }
 
 function updateToggleSettings($group) {
@@ -356,6 +373,39 @@ function applyToggleBehavior(promptManager, toggle, isGroupOn) {
 
     // Reset the token count for the affected prompt
     counts[toggle.target] = null;
+
+    // Check if animation should be disabled
+    if (extensionSettings.disableAnimation) {
+        return; // Skip the animation
+    }
+
+    // Find the toggle item element based on data-target attribute
+    const $toggleItem = $(`.toggle-item[data-target="${toggle.target}"]`);
+
+    // Reset the colors before applying the new state
+    $toggleItem.css({
+        'background-color': '',
+        'color': '',
+        'opacity': ''
+    });
+
+    if (promptOrderEntry.enabled) {
+        $toggleItem.addClass('enabled').removeClass('disabled');
+    } else {
+        $toggleItem.addClass('disabled').removeClass('enabled');
+    }
+
+    clearTimeout(toggle.fadeOutTimeout); // Clear any previously scheduled timeout
+    toggle.fadeOutTimeout = setTimeout(() => {
+        $toggleItem.css({
+            'background-color': 'transparent',
+            'color': 'transparent'
+        });
+
+        if (!promptOrderEntry.enabled) {
+            $toggleItem.animate({ opacity: 1.0 }, 300); // Animate opacity back to 1 for disabled items
+        }
+    }, 1000);
 }
 
 async function editGroupName($group, currentName) {
