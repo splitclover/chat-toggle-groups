@@ -1,5 +1,8 @@
 # Toggle groups for SillyTavern
 
+> [!IMPORTANT]
+> **2025.09.02** - This is extension is no longer maintained for the foreseeable future.
+
 ## Overview
 
 Adds toggle groups for Chat Completion Presets that can target multiple entries at once.
@@ -25,7 +28,3 @@ Find it under Chat Completion Presets tab, just above the prompt list
 ## Contributing
 
 Contributions to improve this extension are welcome. Please fork the repository and submit a pull request with your changes.
-
----
-
-Contact: splitclover@proton.me
